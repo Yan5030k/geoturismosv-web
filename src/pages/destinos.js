@@ -74,7 +74,7 @@ export async function render(root, route) {
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">${esc(tDb(d, 'ubicacion'))}</p>
             <div class="mt-3">${chipsEdad(d.rango_edad)}</div>
             <p class="mt-3 text-gray-700 dark:text-gray-300">${esc((tDb(d, 'descripcion') || '').slice(0, 120))}…</p>
-            <p class="mt-3 text-sm font-bold text-[#0b6fb3]">${esc(formatearPrecio(d.costo_estimado, moneda, rates))}</p>
+            <p class="mt-3 text-sm font-bold text-[#0b6fb3] geo-precio" data-precio-usd="${esc(d.costo_estimado ?? 0)}">${esc(formatearPrecio(d.costo_estimado, moneda, rates))}</p>
             <a href="#/destinos/${d.id}" data-link class="mt-4 inline-block rounded-full bg-[#0b6fb3] px-4 py-2 font-semibold text-white hover:bg-[#168a1a]">${esc(t('home.view_details'))}</a>
           </div>
         </article>`,
@@ -132,7 +132,23 @@ export async function render(root, route) {
   `;
 
   const formEl = root.querySelector('#filtros');
+  const monedaEl = root.querySelector('#moneda');
+  const conversion = root.querySelector('#conversion');
   let timeout;
+
+  const pintarMoneda = (code) => {
+    root.querySelectorAll('[data-precio-usd]').forEach((el) => {
+      el.textContent = formatearPrecio(el.dataset.precioUsd, code, rates);
+    });
+    const min = formEl.querySelector('[name="costo_min"]').value;
+    const max = formEl.querySelector('[name="costo_max"]').value;
+    const bits = [];
+    if (code !== 'USD') bits.push(`1 USD ≈ ${formatearPrecio(1, code, rates)}`);
+    if (min !== '') bits.push(`mínimo ${formatearPrecio(min, code, rates)}`);
+    if (max !== '') bits.push(`máximo ${formatearPrecio(max, code, rates)}`);
+    conversion.textContent = bits.join(' · ');
+  };
+
   const apply = () => {
     const dataForm = new FormData(formEl);
     const q = new URLSearchParams();
@@ -141,23 +157,35 @@ export async function render(root, route) {
     }
     go(q.toString() ? `/destinos?${q}` : '/destinos');
   };
-  formEl.addEventListener('input', () => {
+
+  formEl.addEventListener('input', (e) => {
+    if (e.target.id === 'moneda') return;
+    if (e.target.name === 'costo_min' || e.target.name === 'costo_max') {
+      pintarMoneda(monedaEl.value);
+    }
     clearTimeout(timeout);
     timeout = setTimeout(apply, 350);
   });
   formEl.addEventListener('change', (e) => {
     if (e.target.id === 'moneda') {
       guardarMoneda(e.target.value);
-      apply();
+      pintarMoneda(e.target.value);
       return;
     }
     apply();
   });
-  root.querySelector('#limpiar').addEventListener('click', () => go('/destinos'));
+  root.querySelector('#limpiar').addEventListener('click', () => {
+    guardarMoneda('USD');
+    const actual = (location.hash.replace(/^#/, '') || '/destinos').split('?')[0] || '/destinos';
+    if (actual === '/destinos' && !location.hash.includes('?')) {
+      monedaEl.value = 'USD';
+      formEl.reset();
+      monedaEl.value = 'USD';
+      pintarMoneda('USD');
+      return;
+    }
+    go('/destinos');
+  });
 
-  const conversion = root.querySelector('#conversion');
-  const code = root.querySelector('#moneda').value;
-  if (form.costo_min && code !== 'USD') {
-    conversion.textContent = `Costo mínimo ≈ ${formatearPrecio(form.costo_min, code, rates)}`;
-  }
+  pintarMoneda(moneda);
 }
