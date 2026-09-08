@@ -1,17 +1,22 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import i18n from './i18n';
-import { initAuth } from './composables/useAuth';
 import './style.css';
+import { applyTheme } from './lib/html.js';
+import { initAuth } from './lib/auth.js';
+import { go, startRouter } from './lib/router.js';
+import { handleChromeClick } from './lib/nav.js';
 
-async function boot() {
-  await initAuth();
+const root = document.getElementById('app');
 
-  const app = createApp(App);
-  app.use(router);
-  app.use(i18n);
-  app.mount('#app');
-}
+root.addEventListener('click', async (event) => {
+  const link = event.target.closest('[data-link]');
+  if (link) {
+    event.preventDefault();
+    const href = link.getAttribute('href') || '#/';
+    go(href.replace(/^#/, ''));
+    return;
+  }
+  await handleChromeClick(event);
+});
 
-boot();
+applyTheme();
+await initAuth();
+await startRouter(root);

@@ -54,6 +54,6 @@ export function destinoPayload(form, imagen) {
     hora_apertura: form.hora_apertura || null,
     hora_cierre: form.hora_cierre || null,
     recomendaciones: form.recomendaciones || null,
-    estado: Boolean(form.estado),
+    estado: form.estado === true || form.estado === 'true',
   };
 }

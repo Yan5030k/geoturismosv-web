@@ -9,7 +9,7 @@
 --    "Confirm email" mientras pruebas (si no, el login pide confirmar correo).
 -- 3. SQL Editor → New query → pega ESTE archivo completo → Run.
 -- 4. Authentication → Users → Add user (marca Auto Confirm User):
---      admin@geoturismosv.com  /  12345678
+--      admin@geoturismosv.com  /  Geo2026
 --      usuario@geoturismosv.com / 12345678
 -- 5. Si el UPDATE final no cambió filas (todavía no existían los usuarios),
 --    ejecuta supabase/promover-admin.sql.
@@ -21,9 +21,7 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- -----------------------------------------------------------------------------
--- 1) Primero la tabla profiles.
---    is_admin() es LANGUAGE sql: Postgres valida public.profiles al CREAR
---    la función. Si la tabla no existe todavía, falla con 42P01.
+-- Funciones auxiliares
 -- -----------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION public.set_updated_at()
@@ -36,32 +34,22 @@ BEGIN
 END;
 $$;
 
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
-  nombre text NOT NULL,
-  email text UNIQUE,
-  rol text NOT NULL DEFAULT 'usuario' CHECK (rol IN ('admin', 'usuario')),
-  created_at timestamptz NOT NULL DEFAULT timezone('utc', now()),
-  updated_at timestamptz NOT NULL DEFAULT timezone('utc', now())
-);
-
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
-LANGUAGE plpgsql
+LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-BEGIN
-  RETURN EXISTS (
+  SELECT EXISTS (
     SELECT 1
     FROM public.profiles
     WHERE id = auth.uid()
       AND rol = 'admin'
   );
-END;
 $$;
 
+-- El rol no se cambia desde la app. En el SQL Editor (auth.uid() es null) sí se puede.
 CREATE OR REPLACE FUNCTION public.protect_profile_rol()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -76,6 +64,7 @@ BEGIN
 END;
 $$;
 
+-- Al registrarse en Auth se crea el perfil (rol = usuario).
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -101,6 +90,19 @@ BEGIN
   RETURN NEW;
 END;
 $$;
+
+-- -----------------------------------------------------------------------------
+-- Tabla: profiles  (reemplaza users de Laravel + campo rol)
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
+  nombre text NOT NULL,
+  email text UNIQUE,
+  rol text NOT NULL DEFAULT 'usuario' CHECK (rol IN ('admin', 'usuario')),
+  created_at timestamptz NOT NULL DEFAULT timezone('utc', now()),
+  updated_at timestamptz NOT NULL DEFAULT timezone('utc', now())
+);
 
 DROP TRIGGER IF EXISTS profiles_set_updated_at ON public.profiles;
 CREATE TRIGGER profiles_set_updated_at
@@ -628,33 +630,19 @@ VALUES
 )
 ON CONFLICT (nombre) DO NOTHING;
 
--- Si los usuarios de Auth se crearon ANTES de este script, no tienen fila en profiles.
-INSERT INTO public.profiles (id, nombre, email, rol)
-SELECT
-  u.id,
-  COALESCE(
-    u.raw_user_meta_data->>'nombre',
-    u.raw_user_meta_data->>'name',
-    split_part(u.email, '@', 1)
-  ),
-  u.email,
-  CASE
-    WHEN lower(u.email) = 'admin@geoturismosv.com' THEN 'admin'
-    ELSE 'usuario'
-  END
-FROM auth.users u
-ON CONFLICT (id) DO UPDATE
-  SET email = EXCLUDED.email;
-
 -- =============================================================================
--- PROMOVER ADMIN (por si el INSERT de arriba no alcanzó)
+-- PROMOVER ADMIN
+-- 1. Authentication → Users → Add user:
+--      admin@geoturismosv.com  /  12345678  (Auto Confirm)
+--      usuario@geoturismosv.com / 12345678 (Auto Confirm)
+-- 2. Ejecuta estas líneas (también están en supabase/promover-admin.sql):
 -- =============================================================================
 
 UPDATE public.profiles
 SET rol = 'admin',
     nombre = 'Administrador GeoTurismoSV'
-WHERE lower(email) = 'admin@geoturismosv.com';
+WHERE email = 'admin@geoturismosv.com';
 
 UPDATE public.profiles
 SET nombre = 'Usuario Turista'
-WHERE lower(email) = 'usuario@geoturismosv.com';
+WHERE email = 'usuario@geoturismosv.com';

@@ -1,6 +1,6 @@
 # GeoTurismoSV (versión web)
 
-Plataforma turística de El Salvador. Esta carpeta es la versión **web** (Vue 3 + Supabase + GitHub Pages). El proyecto Laravel original en `Progra4` no se modifica.
+Plataforma turística de El Salvador. Esta carpeta es la versión **web** (HTML + JavaScript + Supabase + GitHub Pages). El proyecto Laravel original en `Progra4` no se modifica.
 
 ## 1. Crear el proyecto en Supabase
 
