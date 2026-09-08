@@ -14,32 +14,31 @@ export async function render(root) {
   const posts = data || [];
 
   root.innerHTML = `
-    <div class="min-h-screen geo-territory">
+    <div class="min-h-screen bg-slate-50 dark:bg-gray-900">
       ${publicNav()}
       <main class="mx-auto max-w-3xl px-6 py-10">
-        <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-[#3ecf4c]">Comunidad</p>
-        <h1 class="mt-2 text-4xl font-black text-white">Lo que otros ya recorrieron</h1>
-        <p class="mt-3 text-gray-400">Inspírate en las visitas reales. No es un feed de anuncios: es bitácora del territorio.</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Comunidad</h1>
+        <p class="mt-3 text-gray-600 dark:text-gray-300">Lo que otros ya recorrieron. Bitácora del territorio, no un muro de anuncios.</p>
         <div class="mt-10 geo-feed">
           ${
             posts.length
               ? posts
                   .map(
-                    (p, i) => `
-            <article class="geo-post" style="animation-delay:${i * 60}ms">
+                    (p) => `
+            <article class="geo-post">
               <img src="${esc(destinoImagen(p.destino?.imagen))}" alt="">
               <div>
-                <p class="text-xs font-bold uppercase tracking-widest text-[#7dffa0]">${esc(p.destino?.departamento || '')}</p>
-                <h2 class="mt-1 text-xl font-black text-white">${esc(p.destino?.nombre || 'Destino')}</h2>
-                <p class="mt-1 text-sm text-gray-400">${esc(p.perfil?.nombre || (auth.user?.id === p.user_id ? auth.profile?.nombre : 'Viajero'))}</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-[#168a1a]">${esc(p.destino?.departamento || '')}</p>
+                <h2 class="mt-1 text-xl font-bold text-gray-900 dark:text-white">${esc(p.destino?.nombre || 'Destino')}</h2>
+                <p class="mt-1 text-sm text-gray-500">${esc(p.perfil?.nombre || (auth.user?.id === p.user_id ? auth.profile?.nombre : 'Viajero'))}</p>
                 <div class="mt-2">${estrellasHtml(p.estrellas)}</div>
-                <p class="mt-3 text-gray-200">${esc(p.comentario)}</p>
-                <a href="#/destinos/${p.destino_id}" data-link class="geo-open">Ver destino</a>
+                <p class="mt-3 text-gray-700 dark:text-gray-300">${esc(p.comentario)}</p>
+                <a href="#/destinos/${p.destino_id}" data-link class="mt-3 inline-block font-semibold text-[#0b6fb3] hover:underline">Ver destino</a>
               </div>
             </article>`,
                   )
                   .join('')
-              : `<p class="text-gray-400">Aún no hay reseñas. Entra y deja la primera en un destino de San Miguel.</p>`
+              : `<p class="text-gray-500">Aún no hay reseñas. Entra y deja la primera.</p>`
           }
         </div>
       </main>

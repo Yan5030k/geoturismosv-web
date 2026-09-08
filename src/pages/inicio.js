@@ -15,14 +15,14 @@ export async function render(root) {
 
   const cards = (destacados || [])
     .map(
-      (d, i) => `
-      <article class="geo-card" style="animation-delay:${i * 90}ms">
-        <img src="${esc(destinoImagen(d.imagen))}" alt="${esc(tDb(d, 'nombre'))}">
-        <div class="geo-card-body">
-          <span class="geo-chip">${esc(tDb(d.categoria, 'nombre'))}</span>
-          <h4 class="mt-3 text-2xl font-black text-white">${esc(tDb(d, 'nombre'))}</h4>
-          <p class="mt-2 text-sm text-gray-400">${esc(tDb(d, 'ubicacion'))}</p>
-          <a href="#/destinos/${d.id}" data-link class="geo-open">${esc(t('home.view_details'))}</a>
+      (d) => `
+      <article class="group overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:-translate-y-2 hover:shadow-xl">
+        <img src="${esc(destinoImagen(d.imagen))}" alt="${esc(tDb(d, 'nombre'))}" class="h-56 w-full object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="p-6">
+          <span class="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase text-[#168a1a]">${esc(tDb(d.categoria, 'nombre'))}</span>
+          <h4 class="mt-3 text-2xl font-bold text-gray-900 dark:text-white">${esc(tDb(d, 'nombre'))}</h4>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">${esc(tDb(d, 'ubicacion'))}</p>
+          <a href="#/destinos/${d.id}" data-link class="mt-5 inline-flex font-semibold text-[#0b6fb3] hover:underline">${esc(t('home.view_details'))}</a>
         </div>
       </article>`,
     )
@@ -51,18 +51,18 @@ export async function render(root) {
             </div>
           </div>
         </section>
-        <section class="py-12 geo-territory">
+        <section class="py-12">
           <div class="mx-auto max-w-7xl px-6">
-            <h3 class="mb-6 text-2xl font-black text-white">${esc(t('home.featured'))}</h3>
-            <div class="geo-masonry">${cards}</div>
+            <h3 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">${esc(t('home.featured'))}</h3>
+            <div class="grid gap-6 md:grid-cols-3">${cards}</div>
           </div>
         </section>
-        <section class="py-12 geo-territory">
+        <section class="py-12 bg-gray-50 dark:bg-gray-800">
           <div class="mx-auto max-w-7xl px-6">
-            <h3 class="mb-2 text-2xl font-black text-center text-white">Explora El Salvador en el mapa</h3>
-            <p class="text-center text-gray-400 mb-4 max-w-2xl mx-auto">Haz clic en un marcador para ver el destino. San Miguel es el territorio del pitch.</p>
-            <p class="text-center mb-8"><a href="#/rutas" data-link class="geo-open">Ver rutas sugeridas del oriente</a></p>
-            <div id="map" class="h-[600px] w-full rounded-2xl border border-white/10"></div>
+            <h3 class="mb-6 text-2xl font-bold text-center text-gray-900 dark:text-white">Explora El Salvador en el mapa</h3>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-4 max-w-2xl mx-auto">Haz clic en un marcador para ver el destino.</p>
+            <p class="text-center mb-8"><a href="#/rutas" data-link class="font-semibold text-[#0b6fb3] hover:underline">Ver rutas sugeridas</a></p>
+            <div id="map" class="h-[600px] w-full rounded-2xl border-4 border-white dark:border-gray-700"></div>
           </div>
         </section>
       </main>

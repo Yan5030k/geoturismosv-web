@@ -4,6 +4,7 @@ import { esc, tDb } from '../lib/html.js';
 import { t } from '../lib/i18n.js';
 import { publicNav } from '../lib/nav.js';
 import { go } from '../lib/router.js';
+import { DEPARTAMENTOS } from '../lib/departamentos.js';
 import { cargarTasas, formatearPrecio, guardarMoneda, monedaGuardada, opcionesMoneda } from '../lib/monedas.js';
 
 const RANGOS = ['Niñez', 'Adolescencia', 'Adultez', 'Adulto Mayor'];
@@ -26,15 +27,22 @@ export async function render(root, route) {
   const { data: cats } = await supabase.from('categorias').select('*').eq('estado', true).order('nombre');
   const categorias = cats || [];
 
-  let query = supabase.from('destinos').select('*, categoria:categorias(*)').eq('estado', true).order('created_at', { ascending: false });
+  let query = supabase.from('destinos').select('*, categoria:categorias(*)').eq('estado', true).order('nombre');
   if (form.categoria_id) query = query.eq('categoria_id', form.categoria_id);
-  if (form.departamento) query = query.eq('departamento', form.departamento);
   if (form.municipio) query = query.ilike('municipio', `%${form.municipio}%`);
   if (form.costo_min !== '') query = query.gte('costo_estimado', form.costo_min);
   if (form.costo_max !== '') query = query.lte('costo_estimado', form.costo_max);
 
   const { data } = await query;
   let destinos = data || [];
+  if (form.departamento) {
+    const depto = form.departamento.toLowerCase();
+    destinos = destinos.filter((d) =>
+      [d.departamento, d.ubicacion]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(depto)),
+    );
+  }
   if (form.search) {
     const s = form.search.toLowerCase();
     destinos = destinos.filter((d) =>
@@ -47,48 +55,40 @@ export async function render(root, route) {
     destinos = destinos.filter((d) => (d.rango_edad || []).includes(form.rango));
   }
 
-  destinos.sort((a, b) => {
-    const as = a.departamento === 'San Miguel' ? 0 : 1;
-    const bs = b.departamento === 'San Miguel' ? 0 : 1;
-    return as - bs;
-  });
-
-  const { data: allDepto } = await supabase.from('destinos').select('departamento').eq('estado', true).not('departamento', 'is', null);
-  const departamentos = [...new Set((allDepto || []).map((d) => d.departamento).filter(Boolean))].sort();
+  const departamentos = DEPARTAMENTOS;
 
   const rates = await cargarTasas();
   const moneda = monedaGuardada();
 
   const cards =
     destinos.length === 0
-      ? `<div class="mt-12 text-center py-10 rounded-3xl bg-white/5"><p class="text-gray-300 text-lg">${esc(t('destinations.no_results'))}</p></div>`
-      : `<div class="mt-10 geo-masonry">${destinos
+      ? `<div class="mt-12 text-center py-10 rounded-2xl bg-white dark:bg-gray-800 shadow"><p class="text-gray-500 dark:text-gray-300 text-lg">${esc(t('destinations.no_results'))}</p></div>`
+      : `<div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">${destinos
           .map(
-            (d, i) => `
-        <article class="geo-card" style="animation-delay:${i * 70}ms">
-          <img src="${esc(destinoImagen(d.imagen))}" alt="${esc(tDb(d, 'nombre'))}">
-          <div class="geo-card-body">
-            <p class="text-sm font-semibold text-[#7dffa0]">${esc(tDb(d.categoria, 'nombre'))}</p>
-            <h2 class="mt-1 text-2xl font-black text-white">${esc(tDb(d, 'nombre'))}</h2>
-            <p class="mt-2 text-sm text-gray-400">${esc(tDb(d, 'ubicacion'))}</p>
+            (d) => `
+        <article class="overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:-translate-y-1 hover:shadow-xl transition">
+          <img src="${esc(destinoImagen(d.imagen))}" alt="${esc(tDb(d, 'nombre'))}" class="h-48 w-full object-cover">
+          <div class="p-5">
+            <p class="text-sm font-semibold text-[#168a1a]">${esc(tDb(d.categoria, 'nombre'))}</p>
+            <h2 class="mt-1 text-xl font-bold text-gray-900 dark:text-white">${esc(tDb(d, 'nombre'))}</h2>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">${esc(tDb(d, 'ubicacion'))}</p>
             <div class="mt-3">${chipsEdad(d.rango_edad)}</div>
-            <p class="mt-3 text-gray-200">${esc((tDb(d, 'descripcion') || '').slice(0, 140))}…</p>
-            <p class="mt-3 text-sm font-bold text-[#f4a000]">${esc(formatearPrecio(d.costo_estimado, moneda, rates))}</p>
-            <a href="#/destinos/${d.id}" data-link class="geo-open">${esc(t('home.view_details'))}</a>
+            <p class="mt-3 text-gray-700 dark:text-gray-300">${esc((tDb(d, 'descripcion') || '').slice(0, 120))}…</p>
+            <p class="mt-3 text-sm font-bold text-[#0b6fb3]">${esc(formatearPrecio(d.costo_estimado, moneda, rates))}</p>
+            <a href="#/destinos/${d.id}" data-link class="mt-4 inline-block rounded-full bg-[#0b6fb3] px-4 py-2 font-semibold text-white hover:bg-[#168a1a]">${esc(t('home.view_details'))}</a>
           </div>
         </article>`,
           )
           .join('')}</div>`;
 
   root.innerHTML = `
-    <div class="min-h-screen geo-territory">
+    <div class="min-h-screen bg-slate-50 dark:bg-gray-900">
       ${publicNav()}
       <main class="mx-auto max-w-7xl px-6 py-10">
-        <p class="text-xs font-extrabold uppercase tracking-[0.2em] text-[#3ecf4c]">Territorio · San Miguel primero</p>
-        <h1 class="mt-2 text-4xl font-black text-white">${esc(t('destinations.title'))}</h1>
-        <p class="mt-2 text-gray-400 max-w-2xl">${esc(t('destinations.desc1'))} El mapa no es una grilla de alquileres: es el oriente leído por edad, clima y comunidad.</p>
-        <form id="filtros" class="mt-8 geo-filters">
-          <label>${esc(t('destinations.search'))}
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">${esc(t('destinations.title'))}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-300">${esc(t('destinations.desc1'))}</p>
+        <form id="filtros" class="mt-6 geo-filters">
+          <label class="geo-filter-search">${esc(t('destinations.search'))}
             <input name="search" value="${esc(form.search)}">
           </label>
           <label>${esc(t('destinations.category'))}
@@ -121,9 +121,11 @@ export async function render(root, route) {
           <label>${esc(t('destinations.show_currency'))}
             <select id="moneda">${opcionesMoneda(moneda)}</select>
           </label>
-          <button type="button" id="limpiar" class="mt-6 rounded-2xl bg-white/10 px-6 py-2 text-sm font-semibold text-white">Limpiar</button>
+          <div class="geo-filter-actions flex items-end">
+            <button type="button" id="limpiar" class="rounded-md bg-slate-100 dark:bg-gray-700 px-6 py-2.5 text-sm font-semibold text-gray-800 dark:text-white border dark:border-gray-600">${esc(t('destinations.clear_filters'))}</button>
+          </div>
         </form>
-        <p id="conversion" class="mt-4 text-sm text-[#7dffa0] font-semibold"></p>
+        <p id="conversion" class="mt-3 text-sm text-[#0b6fb3] font-semibold"></p>
         ${cards}
       </main>
     </div>
