@@ -5,6 +5,7 @@ import { asset, destinoImagen } from '../lib/imagen.js';
 import { esc, tDb } from '../lib/html.js';
 import { t } from '../lib/i18n.js';
 import { publicNav } from '../lib/nav.js';
+import { geoPin, popupDestino } from '../lib/mapa.js';
 
 export async function render(root) {
   const [{ data: destacados }, { data: todos }] = await Promise.all([
@@ -78,15 +79,16 @@ export async function render(root) {
     const lng = parseFloat(destino.longitud);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return;
     const title = esc(tDb(destino, 'nombre'));
-    L.marker([lat, lng])
+    L.marker([lat, lng], { icon: geoPin, title: tDb(destino, 'nombre') })
       .addTo(map)
-      .bindPopup(`
-        <div class="text-center p-2 min-w-[200px]">
-          <img src="${esc(destinoImagen(destino.imagen))}" alt="${title}" class="w-full h-32 object-cover rounded-lg mb-2">
-          <h4 class="font-bold text-gray-900 text-lg mb-2">${title}</h4>
-          <a href="#/destinos/${destino.id}" class="inline-block bg-[#168a1a] text-white px-4 py-2 rounded-full text-sm font-semibold" style="text-decoration:none;">Ver detalles</a>
-        </div>
-      `);
+      .bindPopup(
+        popupDestino({
+          id: destino.id,
+          title,
+          imageUrl: esc(destinoImagen(destino.imagen)),
+        }),
+        { closeButton: true, maxWidth: 260 },
+      );
   });
 
   setTimeout(() => map.invalidateSize(), 80);
