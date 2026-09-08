@@ -53,6 +53,7 @@ export function publicNav() {
           ${navItem('/', t('nav.home'))}
           ${navItem('/destinos', t('nav.destinations'))}
           ${navItem('/rutas', t('nav.routes'))}
+          ${navItem('/emprendimientos', t('nav.ventures'))}
           ${navItem('/comunidad', t('nav.community'))}
           ${navItem('/categorias', t('nav.categories'))}
           ${navItem('/sobre-nosotros', t('nav.about'))}

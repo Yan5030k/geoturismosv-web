@@ -10,7 +10,18 @@
     "logout": "Cerrar sesión",
     "register": "Crear cuenta",
     "routes": "Rutas",
+    "ventures": "Emprendimientos",
     "community": "Comunidad"
+  },
+  "ventures": {
+    "title": "Emprendimientos locales",
+    "desc": "Quien habita el territorio: cocinas de casa, artesanas, guías y lanchas. Cada emprendimiento está anclado al lugar donde trabaja.",
+    "count": "emprendimientos en el mapa",
+    "search": "Buscar emprendimiento",
+    "trade": "Rubro",
+    "all_trades": "Todos los rubros",
+    "see_place": "Ver",
+    "no_results": "No encontramos emprendimientos con esos filtros."
   },
   "about": {
     "title": "Sobre GeoTurismoSV",

@@ -61,7 +61,10 @@ export async function render(root) {
           <div class="mx-auto max-w-7xl px-6">
             <h3 class="mb-6 text-2xl font-bold text-center text-gray-900 dark:text-white">Explora El Salvador en el mapa</h3>
             <p class="text-center text-gray-600 dark:text-gray-300 mb-4 max-w-2xl mx-auto">Haz clic en un marcador para ver el destino.</p>
-            <p class="text-center mb-8"><a href="#/rutas" data-link class="font-semibold text-[#0b6fb3] hover:underline">Ver rutas sugeridas</a></p>
+            <p class="text-center mb-8 flex flex-wrap justify-center gap-6">
+              <a href="#/rutas" data-link class="font-semibold text-[#0b6fb3] hover:underline">Ver rutas sugeridas</a>
+              <a href="#/emprendimientos" data-link class="font-semibold text-[#168a1a] hover:underline">Conocer los emprendimientos</a>
+            </p>
             <div id="map" class="h-[600px] w-full rounded-2xl border-4 border-white dark:border-gray-700"></div>
           </div>
         </section>

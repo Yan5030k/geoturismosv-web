@@ -10,7 +10,18 @@
     "logout": "Logout",
     "register": "Register",
     "routes": "Routes",
+    "ventures": "Local ventures",
     "community": "Community"
+  },
+  "ventures": {
+    "title": "Local ventures",
+    "desc": "The people who live in the territory: home kitchens, artisans, guides and boat owners. Every venture is anchored to the place where it works.",
+    "count": "ventures on the map",
+    "search": "Search venture",
+    "trade": "Trade",
+    "all_trades": "All trades",
+    "see_place": "See",
+    "no_results": "No ventures match those filters."
   },
   "about": {
     "title": "About GeoTurismoSV",
