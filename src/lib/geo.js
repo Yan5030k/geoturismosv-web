@@ -17,6 +17,22 @@ const DEPARTAMENTOS = [
   { nombre: 'Cuscatlán', aliases: ['cuscatlan', 'suchitoto'] },
   { nombre: 'Usulután', aliases: ['usulutan', 'alegria'] },
   { nombre: 'La Unión', aliases: ['la union', 'fonseca', 'golfo'] },
+  {
+    nombre: 'Morazán',
+    aliases: [
+      'morazan',
+      'guatajiagua',
+      'barro negro',
+      'perquin',
+      'ruta de paz',
+      'mozote',
+      'meanguera',
+      'arambala',
+      'rio sapo',
+      'cacahuatique',
+      'osicala',
+    ],
+  },
 ];
 
 const TEMAS = [
@@ -26,6 +42,8 @@ const TEMAS = [
   { id: 'cultura', aliases: ['cultura', 'centro', 'historico', 'iglesia', 'catedral', 'pueblo', 'colonial'] },
   { id: 'familia', aliases: ['familia', 'ninos', 'nino', 'nina', 'piscina', 'turicentro', 'recreo'] },
   { id: 'comida', aliases: ['comida', 'pupusa', 'restaurante', 'mariscos', 'almuerzo'] },
+  { id: 'artesania', aliases: ['artesania', 'artesanias', 'barro', 'alfareria', 'comal', 'tejido', 'henequen', 'hamaca'] },
+  { id: 'memoria', aliases: ['memoria', 'historia', 'museo', 'guerra', 'paz'] },
 ];
 
 const ALMA = {
@@ -36,6 +54,8 @@ const ALMA = {
   'Cuscatlán': 'Suchitoto es piedra, lago Suchitlán y calle empedrada. Un pueblo que se camina, no se consume.',
   'Usulután': 'Alegría es altura, niebla y laguna. El oriente también se lee en fresco.',
   'La Unión': 'El Golfo de Fonseca es agua compartida: El Salvador, Honduras y Nicaragua en un mismo horizonte.',
+  'Morazán':
+    'Morazán es barro, montaña y memoria. Guatajiagua tiñe el barro con nacascolo y lo vuelve negro; Perquín y El Mozote guardan la historia que el país aprendió a decir en voz alta.',
 };
 
 const STOP = new Set([
@@ -103,6 +123,9 @@ function puntuar(destino, pedido, keywordsExtra = []) {
   if (pedido.tema === 'cultura' && /centro|historico|suchitoto|joya|catedral|cultural/.test(blob)) puntos += 8;
   if (pedido.tema === 'familia' && /familia|ninez|piscina|turicentro|eden|cuco/.test(blob)) puntos += 6;
   if (pedido.tema === 'comida' && /restaurante|pupusa|comida|mariscos/.test(blob)) puntos += 6;
+  if (pedido.tema === 'artesania' && /artesan|henequen|tejido|hamaca/.test(blob)) puntos += 6;
+  if (pedido.tema === 'artesania' && /guatajiagua|barro|alfarer|comal/.test(blob)) puntos += 10;
+  if (pedido.tema === 'memoria' && /perquin|mozote|museo|memoria|historic/.test(blob)) puntos += 8;
   pedido.crudo
     .split(/\s+/)
     .filter((w) => w.length > 4 && !STOP.has(w))
@@ -131,6 +154,12 @@ function redactar(pedido, destinos) {
   }
   if (pedido.tema === 'volcan') {
     return `${alma} Para volcán, te recomiendo ${lista}.${hilo}`;
+  }
+  if (pedido.tema === 'artesania') {
+    return `${alma} Si buscas oficio hecho a mano, te llevo a ${lista}.${hilo}`;
+  }
+  if (pedido.tema === 'memoria') {
+    return `${alma} Para leer la historia en el territorio, te recomiendo ${lista}.${hilo}`;
   }
   return `${alma} Te recomiendo ${lista}.${hilo}`;
 }
@@ -161,6 +190,8 @@ export async function recomendarConGeo(texto) {
   if (pedido.tema === 'playa') params.set('search', 'playa');
   if (pedido.tema === 'volcan') params.set('search', 'volcán');
   if (pedido.tema === 'lago') params.set('search', 'lago');
+  if (pedido.tema === 'artesania') params.set('search', 'barro');
+  if (pedido.tema === 'memoria') params.set('search', 'memoria');
 
   const path = ranked.length === 1 ? `/destinos/${ranked[0].d.id}` : `/destinos${params.toString() ? `?${params}` : ''}`;
   return { frase, pedido, path };

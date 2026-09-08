@@ -78,6 +78,40 @@ export const RUTAS = [
     ],
   },
   {
+    id: 'morazan-barro-memoria',
+    region: 'Morazán',
+    titulo: 'Ruta de Paz: barro, memoria y montaña',
+    lema: 'Guatajiagua tiñe el barro de negro; el norte guarda la historia y el agua.',
+    duracion: 'Un día completo',
+    km: '≈ 80 km',
+    puntos: [
+      {
+        nombre: 'Guatajiagua',
+        hora: '08:00',
+        nota: 'Talleres de barro negro trabajando temprano. Llevar efectivo para comprar en el taller.',
+        color: '#0b6fb3',
+      },
+      {
+        nombre: 'El Mozote',
+        hora: '11:00',
+        nota: 'Sitio de memoria. Ir con guía de la comunidad y guardar silencio en el monumento.',
+        color: '#168a1a',
+      },
+      {
+        nombre: 'Perquín',
+        hora: '13:30',
+        nota: 'Almuerzo, museo y café de altura. El pueblo se camina en poco tiempo.',
+        color: '#f4a000',
+      },
+      {
+        nombre: 'Cascada El Perol',
+        hora: '16:00',
+        nota: 'Bajada corta con guía para cerrar el día. Calzado con tracción.',
+        color: '#0b6fb3',
+      },
+    ],
+  },
+  {
     id: 'libertad-costa-memoria',
     region: 'La Libertad',
     titulo: 'Ruta de costa y memoria',

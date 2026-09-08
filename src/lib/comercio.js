@@ -45,6 +45,29 @@ export const COMERCIO_FALLBACK = {
       keywords: ['comida', 'pupusas'],
     },
   ],
+  Guatajiagua: [
+    {
+      nombre: 'Alfarería de barro negro Las Comaleras',
+      descripcion: 'Comales, ollas y jarros teñidos con nacascolo. Venta directa desde el taller.',
+      logo_url: 'https://images.unsplash.com/photo-1493106641515-6b5631de4bb9?auto=format&fit=crop&w=400&q=80',
+      costo_estimado: 8,
+      keywords: ['barro negro', 'artesanía'],
+    },
+    {
+      nombre: 'Taller de barro El Nacascolo',
+      descripcion: 'Demostración del torno y del teñido. El visitante moldea su propia pieza.',
+      logo_url: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=80',
+      costo_estimado: 5,
+      keywords: ['barro negro', 'taller', 'familia'],
+    },
+    {
+      nombre: 'Comedor La Comalera',
+      descripcion: 'Pupusas y tortillas cocidas en comal de barro de Guatajiagua.',
+      logo_url: 'https://images.unsplash.com/photo-1615873968403-89e068629265?auto=format&fit=crop&w=400&q=80',
+      costo_estimado: 3,
+      keywords: ['comida', 'pupusas'],
+    },
+  ],
   'Volcán Chaparrastique': [
     {
       nombre: 'Guías del Chaparrastique',
