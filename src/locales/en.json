@@ -8,7 +8,9 @@
     "panel": "My Dashboard",
     "favorites": "My Favorites",
     "logout": "Logout",
-    "register": "Register"
+    "register": "Register",
+    "routes": "Routes",
+    "community": "Community"
   },
   "about": {
     "title": "About GeoTurismoSV",

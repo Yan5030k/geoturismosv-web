@@ -3,6 +3,7 @@ import { applyTheme } from './lib/html.js';
 import { initAuth } from './lib/auth.js';
 import { go, startRouter } from './lib/router.js';
 import { handleChromeClick } from './lib/nav.js';
+import { mountGeo } from './lib/geo.js';
 
 const root = document.getElementById('app');
 
@@ -19,4 +20,5 @@ root.addEventListener('click', async (event) => {
 
 applyTheme();
 await initAuth();
+mountGeo();
 await startRouter(root);

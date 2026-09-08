@@ -60,6 +60,8 @@ async function loadPage(route) {
   if (route.path === '/') return import('../pages/inicio.js');
   if (route.path === '/destinos') return import('../pages/destinos.js');
   if (route.destId) return import('../pages/detalle.js');
+  if (route.path === '/rutas') return import('../pages/rutas.js');
+  if (route.path === '/comunidad') return import('../pages/comunidad.js');
   if (route.path === '/categorias') return import('../pages/categorias.js');
   if (route.path === '/sobre-nosotros') return import('../pages/nosotros.js');
   if (['/entrar', '/login', '/register'].includes(route.path)) return import('../pages/entrar.js');
